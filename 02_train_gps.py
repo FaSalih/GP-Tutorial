@@ -10,9 +10,9 @@ from tqdm import tqdm
 from utils.normalize import normalize
 from utils.gp_tools import buildGP, gpPredict
 
-# Define normalization methods
+# Define normalization methods to loop over - complete list = ['Standardization', 'MinMax', 'LogStand', 'Log+bStand', 'Sqrt']
 featureNorm = None
-labelNormalizations = ['Standardization', 'MinMax', 'LogStand', 'Log+bStand', 'Sqrt']
+labelNormalizations = ['Standardization', 'MinMax', 'Log+bStand', 'Sqrt']
 
 # Kernels to Consider
 kernels = ['RBF', 'RQ', 'Matern32', 'Matern52']

@@ -46,19 +46,31 @@ def normalize(inputArray,skScaler=None,method='Standardization',reverse=False):
         as the inputted skScaler, if it was provided.
 
     """
+    # Convert input to numpy array if not on already
+    inputArray=np.array(inputArray)
     # If inputArray is a labels vector of size (N,), reshape to (N,1)
     if inputArray.ndim==1:
         inputArray=inputArray.reshape((-1,1))
         warnings.warn('Input to normalize() was of shape (N,). It was assumed'\
                       +' to be a column array and converted to a (N,1) shape.')
+    # If method is None, return inputArray as it is
+    if method is None: return inputArray, None
+    # Set bias that prevent taking log o sqrt of negative numbers (abs(bias) should be > abs(min(inputArray)))
+    bias=10
     # If skScaler is None and in forward mode, train scaler for the first time
     if skScaler is None:
-        # Check method
-        if method=='Standardization' or method=='MinMax': aux=inputArray
-        elif method=='LogStand': aux=np.log(inputArray)
-        elif method=='Log+bStand': aux=np.log(inputArray+10**-3)
-        elif method=='Sqrt': aux=np.sqrt((inputArray+1e-3)/100)
+        # Check scaling method
+        if method=='Standardization' or method=='MinMax': 
+            aux=inputArray
+        elif method=='LogStand': 
+            aux=np.log(inputArray)
+        elif method=='Log+bStand': 
+            # Get bias from inputArray itself (prevent taking log of a negative number)
+            aux=np.log(inputArray+bias)
+        elif method=='Sqrt': 
+            aux=np.sqrt((inputArray+bias)/100)
         else: raise ValueError('Could not recognize method in normalize().')
+        # Normalize scaled data
         if method not in ['MinMax', 'Sqrt']:
             skScaler=StandardScaler().fit(aux)
         else:
@@ -69,14 +81,14 @@ def normalize(inputArray,skScaler=None,method='Standardization',reverse=False):
         inputArray=skScaler.inverse_transform(inputArray)
         # Check method
         if method=='LogStand': inputArray=np.exp(inputArray)
-        elif method=='Log+bStand': inputArray=np.exp(inputArray)-10**-3
-        elif method=='Sqrt': inputArray=100*inputArray**2 - 1e-3
+        elif method=='Log+bStand': inputArray=np.exp(inputArray)-bias
+        elif method=='Sqrt': inputArray=100*inputArray**2 - bias
     elif not reverse:
         # Check method and scale un-normalized data if necessary
         if method=='Standardization' or method=='MinMax': aux=inputArray
         elif method=='LogStand': aux=np.log(inputArray)
-        elif method=='Log+bStand': aux=np.log(inputArray+10**-3)
-        elif method=='Sqrt': aux=np.sqrt((inputArray+1e-3)/100)
+        elif method=='Log+bStand': aux=np.log(inputArray+bias)
+        elif method=='Sqrt': aux=np.sqrt((inputArray+bias)/100)
         else: raise ValueError('Could not recognize method in normalize().')
         inputArray=skScaler.transform(aux)
     # Return

@@ -32,7 +32,7 @@ This repository contains a comprehensive tutorial on Gaussian Process (GP) model
   - Matérn 3/2
   - Matérn 5/2
 - K-fold cross-validation support
-- Visualization tools for model performance analysis
+- Visualization tools for model performance analysis (*not completed yet*)
 
 ## Getting Started
 

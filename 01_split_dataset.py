@@ -6,7 +6,7 @@ provided arguments.
 
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold
-import argparse, os
+import argparse, os, subprocess
 import numpy as np
 
 def split_data(csv_path, target_col_name, n_splits=5, out_dir="data-splits"):
@@ -24,7 +24,9 @@ def split_data(csv_path, target_col_name, n_splits=5, out_dir="data-splits"):
     # Create a placeholder input array
     X = df.drop(columns=[target_col_name], axis=1)
     
+    # create and empty directory
     os.makedirs(out_dir, exist_ok=True)
+    subprocess.run(f"rm {out_dir}/*.csv", shell=True)
 
     # Loop over the training and testing indices
     for k, (train_idx, test_idx) in enumerate(skf.split(X, prop_cut)):
@@ -32,8 +34,8 @@ def split_data(csv_path, target_col_name, n_splits=5, out_dir="data-splits"):
         # Save the training and testing property data to a csv file
         train_df = df.iloc[train_idx]
         test_df = df.iloc[test_idx]
-        train_df.to_csv(f"{out_dir}/train_fold_{k+1}.csv", index=False)
-        test_df.to_csv(f"{out_dir}/test_fold_{k+1}.csv", index=False)
+        train_df.to_csv(f"{out_dir}/train_fold_{k+1}.csv", index=True)
+        test_df.to_csv(f"{out_dir}/test_fold_{k+1}.csv", index=True)
 
 
 if __name__ == "__main__":

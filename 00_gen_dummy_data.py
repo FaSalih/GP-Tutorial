@@ -19,7 +19,7 @@ df = pd.DataFrame({
     'X': x_data,
     'Y': y_data
 })
-df.to_csv("dummy_data.csv")
+df.to_csv("dummy_data.csv",index=False)
 
 # plot 
 plt.figure(figsize=(5,4))
