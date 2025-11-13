@@ -43,7 +43,7 @@ if __name__ == "__main__":
     parser.add_argument("--csv", required=True, help="Path to csv file containing target data. Column 0 is assumed to be a non-trivial index column.")
     parser.add_argument("--target", required=True, help="Name of csv column containing target data.")
     parser.add_argument("--dir", default="data-splits", help="Path to directory to save results in. The folder will be created if it does not already exist. Default value is `data-splits`.")
-    parser.add_argument("--folds", type=int, default=4, help="Number of k-folds or data splits to generate. Default value is 5.")
+    parser.add_argument("--folds", type=int, default=4, help="Number of k-folds or data splits to generate. Default value is 4.")
     parser.add_argument("--bins", type=int, default=15, help="Number of bins to discretize continuous target property into. Default value is 15.")
     args = parser.parse_args()
 

@@ -1,9 +1,10 @@
 
 import pandas as pd
-import gpflow, numpy as np, os, argparse, pickle
+import numpy as np
+import os, argparse, pickle
 
 from utils.normalize import normalize
-from utils.gp_tools import buildGP, gpPredict
+from utils.gp_tools import gpPredict
 
 # Define normalization methods to loop over - complete list = ['Standardization', 'MinMax', 'LogStand', 'Log+bStand', 'Sqrt']
 featureNorm = None
@@ -11,9 +12,6 @@ labelNormalizations = ['Standardization', 'MinMax', 'Log+bStand', 'Sqrt']
 
 # Kernels to Consider
 kernels = ['RBF', 'RQ', 'Matern32', 'Matern52']
-
-# Number of Folds
-nfolds = 3
 
 def load_gp_model(model_file):
     with open(model_file, "rb") as f:
@@ -25,11 +23,14 @@ def load_scaler(scaler_file):
         X_train_scaler, Y_train_scaler, featureNorm, labelNorm = pickle.load(f)
     return X_train_scaler, Y_train_scaler, featureNorm, labelNorm
 
-def deploy_models(data_file, target_col):
+def deploy_models(data_file, n_folds, target_col):
     # Read data for fitting
     df_dat = pd.read_csv(data_file, index_col=0)
-    X_dat = df_dat.drop(columns=[target_col], axis=1)
-    Y_dat = df_dat[target_col]
+    if target_col is not None:
+        X_dat = df_dat.drop(columns=[target_col], axis=1)
+        # Y_dat = df_dat[target_col]
+    else:
+        X_dat = df_dat.copy(deep=True)
 
     # Define  folders for saved trained models and scalers
     models_folder = f"models"
@@ -40,7 +41,7 @@ def deploy_models(data_file, target_col):
     os.makedirs(pred_folder, exist_ok=True)
 
     # Loop over folds
-    for k_fold in range(1,nfolds+1):
+    for k_fold in range(1,n_folds+1):
         for labelNorm in labelNormalizations:
             for kernel in kernels:
                 # Load desired GP model and scaler
@@ -51,7 +52,6 @@ def deploy_models(data_file, target_col):
 
                 # Deploy loaded model
                 X_dat_norm, _ = normalize(X_dat, skScaler=X_scaler, method=featureNorm)
-                Y_dat_norm, _ = normalize(Y_dat, skScaler=Y_scaler, method=labelNorm)
 
                 Y_pred_norm, Y_std = gpPredict(model,X_dat_norm)
 
@@ -68,9 +68,9 @@ def deploy_models(data_file, target_col):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    # parser.add_argument("--csv", required=True)
-    # parser.add_argument("--target", required=True)
-    # args = parser.parse_args()
+    parser.add_argument("--csv", required=True, help="Path to csv file containing feature data. Column 0 is assumed to be a non-trivial index column. It is assumed that there is no target column, unless a name is provided with the `target` argument.")
+    parser.add_argument("--folds", type=int, required=True, help="Number of k-folds or data splits to generate. This argument is required.")
+    parser.add_argument("--target", default=None, help="Name of target column to drop from csv to leave only samples index and features. Default is `None`")
+    args = parser.parse_args()
 
-    # deploy_models(args.csv, args.target)
-    deploy_models("dummy_data.csv", "Y")
+    deploy_models(args.csv, args.folds, args.target)
