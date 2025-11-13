@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
-import gpflow
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import r2_score, mean_absolute_error
-import matplotlib.pyplot as plt
 import os, argparse, warnings, pickle
 from tqdm import tqdm
 
@@ -17,7 +14,7 @@ labelNormalizations = ['Standardization', 'MinMax', 'Log+bStand', 'Sqrt']
 # Kernels to Consider
 kernels = ['RBF', 'RQ', 'Matern32', 'Matern52']
 
-def train_gp_models(k_fold, target_col):
+def train_gp_models(k_fold, target_col, out_dir):
     # initialize dataframe to store metrics
     R2_train_df = pd.DataFrame(index=kernels, columns=[])
     mae_train_df = pd.DataFrame(index=kernels, columns=[])
@@ -25,11 +22,11 @@ def train_gp_models(k_fold, target_col):
     mae_test_df = pd.DataFrame(index=kernels, columns=[])
 
     # Read training data for current fold
-    df_train = pd.read_csv(f"data-splits/train_fold_{k_fold}.csv", index_col=0)
+    df_train = pd.read_csv(f"{out_dir}/train_fold_{k_fold}.csv", index_col=0)
     X_train = df_train.drop(columns=[target_col], axis=1)
     Y_train = df_train[target_col]
     # Read testing data for current fold
-    df_test = pd.read_csv(f"data-splits/test_fold_{k_fold}.csv", index_col=0)
+    df_test = pd.read_csv(f"{out_dir}/test_fold_{k_fold}.csv", index_col=0)
     X_test = df_test.drop(columns=[target_col], axis=1)
     Y_test = df_test[target_col]
 
@@ -109,9 +106,11 @@ def train_gp_models(k_fold, target_col):
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--target", required=True)
-    parser.add_argument("--kfold", required=True)
+    parser.add_argument("--target", required=True, help="Name of csv column containing target data.")
+    parser.add_argument("--kfold", required=True, help="Number of k-fold to run GP-fitting on. If `01_split_datasets.py` was used to generate the data splits, fold numbers start from 1.")
+    parser.add_argument("--dir", default="data-splits", help="Path to directory to save results in. The folder will be created if it does not already exist. Default value is `data-splits`.")
     args = parser.parse_args()
 
-    train_gp_models(args.kfold, args.target)
+    train_gp_models(args.kfold, args.target, args.dir)
+
 

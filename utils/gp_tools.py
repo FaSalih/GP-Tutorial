@@ -5,7 +5,6 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import r2_score, mean_absolute_error
 import matplotlib.pyplot as plt
 import joblib, os, argparse, warnings, pickle
-from tqdm import tqdm
 
 def buildGP(X_Train,Y_Train,gpConfig={}):
     """
