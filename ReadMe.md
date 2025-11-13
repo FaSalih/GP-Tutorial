@@ -87,7 +87,7 @@ The scripts are named in the order they should be run, and help messages detaili
 To ensure reproducibility, please install the conda environment as such: 
 
 ```
-conda create -f env.yml
+conda env create -f env.yml
 ```
 
 ## Usage Notes
