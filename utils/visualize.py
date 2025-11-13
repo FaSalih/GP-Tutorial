@@ -28,15 +28,15 @@ plt.rcParams["savefig.pad_inches"]=0.02
 # Functions
 # =============================================================================
 
-def data_splits(target_col_name, n_splits, n_bins,  out_dir):
+def data_splits(target_col_name, n_folds, n_bins,  out_dir):
     # Initialize a plot to visualize the distribution of the property data
     nrows = 2
-    ncols = int(np.ceil(n_splits/nrows))
+    ncols = int(np.ceil(n_folds/nrows))
     fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(3*ncols, 3*nrows))
     axs = axs.flatten()
     
     # Loop over the training and testing indices
-    for k in range(n_splits):
+    for k in range(n_folds):
         # Read the training and testing property data to a csv file
         train_df = pd.read_csv(f"{out_dir}/train_fold_{k+1}.csv", index_col=0)
         test_df = pd.read_csv(f"{out_dir}/test_fold_{k+1}.csv", index_col=0)
