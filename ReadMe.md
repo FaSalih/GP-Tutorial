@@ -69,12 +69,6 @@ The scripts are named in the order they should be run, and help messages detaili
       ```bash
       python 03_deploy_model.py --csv dummy_data.csv --folds 4 --target Y
       ```
-
-1. Visualize the results:
-      ```bash
-      python 04_visualize.py
-      ```
-
 ## Dependencies
 
 - NumPy
